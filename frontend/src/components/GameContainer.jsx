@@ -75,7 +75,9 @@ const GameContainer = () => {
       }
 
       const result = await submitBattle(battleData)
-      
+
+      console.log('Battle result:', result)
+
       // Add battle result to history
       addBattleResult({
         ...result,
@@ -83,12 +85,19 @@ const GameContainer = () => {
       })
 
       // Update HP based on result
-      if (result.winner_id === 'player1') {
+      // Judge API returns winner_id as 'player_1' or 'player_2'
+      if (result.winner_id === 'player_1') {
         // Player won - opponent takes damage
-        updateOpponentHP(opponent.hp - result.damage_dealt)
-      } else if (result.winner_id === 'player2') {
+        const newOpponentHP = opponent.hp - result.damage_dealt
+        console.log(`Opponent takes ${result.damage_dealt} damage. HP: ${opponent.hp} -> ${newOpponentHP}`)
+        updateOpponentHP(newOpponentHP)
+      } else if (result.winner_id === 'player_2') {
         // Opponent won - player takes damage
-        updatePlayerHP(player.hp - result.damage_dealt)
+        const newPlayerHP = player.hp - result.damage_dealt
+        console.log(`Player takes ${result.damage_dealt} damage. HP: ${player.hp} -> ${newPlayerHP}`)
+        updatePlayerHP(newPlayerHP)
+      } else {
+        console.log('Battle was a tie - no damage dealt')
       }
 
       // Draw new hand for next turn
