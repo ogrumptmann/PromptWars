@@ -133,13 +133,44 @@ docker exec -it promptwars-frontend sh
 
 ## 🧪 Testing
 
-```bash
-# Backend tests (coming in Phase 2)
-docker exec promptwars-backend pytest
+### Running Tests
 
-# Frontend tests (coming in Phase 2)
-docker exec promptwars-frontend npm test
+**All tests (recommended before committing):**
+```bash
+# Windows
+.\run-tests.ps1
+
+# Linux/Mac
+./run-tests.sh
 ```
+
+**Backend tests only:**
+```bash
+docker-compose exec backend python -m pytest -v
+```
+
+**Frontend tests only:**
+```bash
+docker-compose exec frontend npm test -- --run
+```
+
+### Test Coverage
+
+- **Backend**: 50% minimum coverage required (pytest + pytest-cov)
+- **Frontend**: Vitest with React Testing Library
+- **CI/CD**: GitHub Actions runs all tests on push/PR
+- Coverage will increase as more features are implemented in Phase 2+
+
+### Test Structure
+
+**Backend** (`backend/tests/`):
+- `test_health.py` - Health check endpoint tests
+- `test_redis_service.py` - Redis operations tests
+- `test_websocket.py` - WebSocket connection manager tests
+
+**Frontend** (`frontend/src/`):
+- `App.test.jsx` - Main app component tests
+- `hooks/useWebSocket.test.js` - WebSocket hook tests
 
 ## 📝 License
 
