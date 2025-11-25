@@ -31,6 +31,7 @@ const GameContainer = () => {
     setLoading,
     setError,
     setAllCards,
+    resetGame,
   } = useGameStore()
 
   // Initialize game - fetch cards and draw initial hand
@@ -110,7 +111,7 @@ const GameContainer = () => {
       setLoading(false)
     } catch (err) {
       console.error('Failed to submit prompt:', err)
-      setError(err.message)
+      setError(`Failed to submit battle: ${err.message}. Please try again or reset the game.`)
       setLoading(false)
       setHasSubmitted(false)
     }
@@ -131,11 +132,24 @@ const GameContainer = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black text-white p-4">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
           <h1 className="text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
             ⚔️ Prompt Wars
           </h1>
           <p className="text-gray-300">Battle with creative prompts!</p>
+
+          {/* Reset Button */}
+          <button
+            onClick={() => {
+              if (confirm('Are you sure you want to reset the game?')) {
+                resetGame()
+                window.location.reload()
+              }
+            }}
+            className="absolute top-0 right-0 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+          >
+            🔄 Reset Game
+          </button>
         </div>
 
         {/* Error Display */}

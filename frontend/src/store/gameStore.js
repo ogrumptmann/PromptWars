@@ -88,13 +88,21 @@ export const useGameStore = create((set, get) => ({
   
   setError: (error) => set({ error }),
   
-  updatePlayerHP: (hp) => set((state) => ({
-    player: { ...state.player, hp: Math.max(0, Math.min(100, hp)) }
-  })),
-  
-  updateOpponentHP: (hp) => set((state) => ({
-    opponent: { ...state.opponent, hp: Math.max(0, Math.min(100, hp)) }
-  })),
+  updatePlayerHP: (hp) => {
+    const clampedHP = Math.max(0, Math.min(100, hp))
+    console.log(`[Store] Updating player HP to ${clampedHP}`)
+    set((state) => ({
+      player: { ...state.player, hp: clampedHP }
+    }))
+  },
+
+  updateOpponentHP: (hp) => {
+    const clampedHP = Math.max(0, Math.min(100, hp))
+    console.log(`[Store] Updating opponent HP to ${clampedHP}`)
+    set((state) => ({
+      opponent: { ...state.opponent, hp: clampedHP }
+    }))
+  },
   
   incrementTurn: () => set((state) => ({
     currentTurn: state.currentTurn + 1,

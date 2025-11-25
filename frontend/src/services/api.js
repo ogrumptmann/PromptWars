@@ -57,7 +57,10 @@ export const submitBattle = async (battleData) => {
     body: JSON.stringify(battleData),
   })
   if (!response.ok) {
-    throw new Error('Failed to submit battle')
+    const errorData = await response.json().catch(() => ({}))
+    const errorMessage = errorData.detail || `HTTP ${response.status}: ${response.statusText}`
+    console.error('Battle submission failed:', errorMessage, errorData)
+    throw new Error(errorMessage)
   }
   return response.json()
 }
