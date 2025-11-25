@@ -80,16 +80,23 @@ describe('App', () => {
   })
 
   it('handles fetch error gracefully', async () => {
+    // Suppress console.error for this test since we're intentionally causing an error
+    const consoleError = console.error
+    console.error = vi.fn()
+
     global.fetch.mockRejectedValue(new Error('Network error'))
-    
+
     render(<App />)
-    
+
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument()
     })
-    
+
     // App should still render even if health check fails
     expect(screen.getByText(/Prompt Wars/i)).toBeInTheDocument()
+
+    // Restore console.error
+    console.error = consoleError
   })
 })
 
