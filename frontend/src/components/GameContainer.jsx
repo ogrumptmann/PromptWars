@@ -1,0 +1,179 @@
+/**
+ * GameContainer Component
+ * Main game orchestrator - manages game flow and state
+ */
+import { useEffect } from 'react'
+import { useGameStore } from '../store/gameStore'
+import { fetchCards, drawHand, submitBattle } from '../services/api'
+import PlayerStatus from './PlayerStatus'
+import CardHand from './CardHand'
+import PromptInput from './PromptInput'
+import BattleLog from './BattleLog'
+
+const GameContainer = () => {
+  const {
+    player,
+    opponent,
+    myPrompt,
+    mySelectedCards,
+    hasSubmitted,
+    battleHistory,
+    isLoading,
+    error,
+    setPlayerHand,
+    setMyPrompt,
+    toggleCardSelection,
+    setHasSubmitted,
+    addBattleResult,
+    updatePlayerHP,
+    updateOpponentHP,
+    incrementTurn,
+    setLoading,
+    setError,
+    setAllCards,
+  } = useGameStore()
+
+  // Initialize game - fetch cards and draw initial hand
+  useEffect(() => {
+    const initializeGame = async () => {
+      try {
+        setLoading(true)
+        
+        // Fetch all cards for reference
+        const allCards = await fetchCards()
+        setAllCards(allCards)
+        
+        // Draw initial hand
+        const hand = await drawHand(3)
+        setPlayerHand(hand)
+        
+        setLoading(false)
+      } catch (err) {
+        console.error('Failed to initialize game:', err)
+        setError(err.message)
+        setLoading(false)
+      }
+    }
+
+    initializeGame()
+  }, [])
+
+  const handlePromptSubmit = async () => {
+    try {
+      setLoading(true)
+      setHasSubmitted(true)
+
+      // For now, simulate a battle against a mock opponent
+      // In Phase 2.6, this will be replaced with WebSocket communication
+      const battleData = {
+        player1_name: player.username || 'You',
+        player1_prompt: myPrompt,
+        player1_cards: mySelectedCards,
+        player2_name: opponent.username || 'AI Opponent',
+        player2_prompt: 'A mighty ice dragon descends from frozen peaks, breathing crystalline shards',
+        player2_cards: ['ice', 'summon', 'crystal'],
+      }
+
+      const result = await submitBattle(battleData)
+      
+      // Add battle result to history
+      addBattleResult({
+        ...result,
+        turn: battleHistory.length + 1,
+      })
+
+      // Update HP based on result
+      if (result.winner_id === 'player1') {
+        // Player won - opponent takes damage
+        updateOpponentHP(opponent.hp - result.damage_dealt)
+      } else if (result.winner_id === 'player2') {
+        // Opponent won - player takes damage
+        updatePlayerHP(player.hp - result.damage_dealt)
+      }
+
+      // Draw new hand for next turn
+      const newHand = await drawHand(3)
+      setPlayerHand(newHand)
+
+      // Increment turn
+      incrementTurn()
+      
+      setLoading(false)
+    } catch (err) {
+      console.error('Failed to submit prompt:', err)
+      setError(err.message)
+      setLoading(false)
+      setHasSubmitted(false)
+    }
+  }
+
+  if (isLoading && player.hand.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-white text-xl">Loading game...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black text-white p-4">
+      <div className="container mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            ⚔️ Prompt Wars
+          </h1>
+          <p className="text-gray-300">Battle with creative prompts!</p>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-900 bg-opacity-50 border-2 border-red-500 rounded-lg">
+            <p className="text-white">❌ {error}</p>
+          </div>
+        )}
+
+        {/* Player Status Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <PlayerStatus player={player} isOpponent={false} />
+          <PlayerStatus player={opponent} isOpponent={true} />
+        </div>
+
+        {/* Main Game Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Cards and Prompt */}
+          <div className="lg:col-span-2 space-y-6">
+            <CardHand
+              cards={player.hand}
+              selectedCards={mySelectedCards}
+              onCardSelect={toggleCardSelection}
+              disabled={hasSubmitted || isLoading}
+            />
+            <PromptInput
+              value={myPrompt}
+              onChange={setMyPrompt}
+              onSubmit={handlePromptSubmit}
+              disabled={hasSubmitted || isLoading}
+              selectedCards={mySelectedCards}
+            />
+          </div>
+
+          {/* Right Column - Battle Log */}
+          <div className="lg:col-span-1">
+            <BattleLog
+              battleHistory={battleHistory}
+              playerName={player.username}
+              opponentName={opponent.username}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default GameContainer
+
