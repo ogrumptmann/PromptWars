@@ -23,7 +23,7 @@ export const fetchCards = async () => {
  * @returns {Promise<Array>} Array of card objects
  */
 export const drawHand = async (handSize = 3) => {
-  const response = await fetch(`${API_BASE_URL}/api/cards/draw?hand_size=${handSize}`)
+  const response = await fetch(`${API_BASE_URL}/api/cards/draw/hand?hand_size=${handSize}`)
   if (!response.ok) {
     throw new Error('Failed to draw hand')
   }
