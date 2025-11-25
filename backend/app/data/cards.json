@@ -1,0 +1,125 @@
+{
+  "cards": [
+    {
+      "id": "fire",
+      "name": "Fire",
+      "type": "element",
+      "description": "Harness the destructive power of flames and heat"
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "type": "element",
+      "description": "Command the flowing force of rivers and oceans"
+    },
+    {
+      "id": "earth",
+      "name": "Earth",
+      "type": "element",
+      "description": "Wield the solid strength of stone and soil"
+    },
+    {
+      "id": "air",
+      "name": "Air",
+      "type": "element",
+      "description": "Control the invisible currents of wind and sky"
+    },
+    {
+      "id": "lightning",
+      "name": "Lightning",
+      "type": "element",
+      "description": "Strike with the raw energy of thunderbolts"
+    },
+    {
+      "id": "ice",
+      "name": "Ice",
+      "type": "element",
+      "description": "Freeze your enemies with bitter cold"
+    },
+    {
+      "id": "shadow",
+      "name": "Shadow",
+      "type": "element",
+      "description": "Embrace the darkness and stealth of night"
+    },
+    {
+      "id": "attack",
+      "name": "Attack",
+      "type": "action",
+      "description": "Launch an aggressive offensive strike"
+    },
+    {
+      "id": "defend",
+      "name": "Defend",
+      "type": "action",
+      "description": "Protect yourself with defensive maneuvers"
+    },
+    {
+      "id": "heal",
+      "name": "Heal",
+      "type": "action",
+      "description": "Restore vitality and mend wounds"
+    },
+    {
+      "id": "summon",
+      "name": "Summon",
+      "type": "action",
+      "description": "Call forth creatures or allies to aid you"
+    },
+    {
+      "id": "transform",
+      "name": "Transform",
+      "type": "action",
+      "description": "Change form or alter the battlefield"
+    },
+    {
+      "id": "enchant",
+      "name": "Enchant",
+      "type": "action",
+      "description": "Imbue objects or beings with magical properties"
+    },
+    {
+      "id": "sword",
+      "name": "Sword",
+      "type": "material",
+      "description": "A blade of steel, symbol of warriors"
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "type": "material",
+      "description": "A barrier of protection against harm"
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "type": "material",
+      "description": "A gem of pure magical energy"
+    },
+    {
+      "id": "book",
+      "name": "Book",
+      "type": "material",
+      "description": "Ancient tome containing forbidden knowledge"
+    },
+    {
+      "id": "potion",
+      "name": "Potion",
+      "type": "material",
+      "description": "A mystical elixir with powerful effects"
+    },
+    {
+      "id": "armor",
+      "name": "Armor",
+      "type": "material",
+      "description": "Heavy plating that deflects attacks"
+    },
+    {
+      "id": "staff",
+      "name": "Staff",
+      "type": "material",
+      "description": "A magical rod that channels arcane power"
+    }
+  ]
+}
+
