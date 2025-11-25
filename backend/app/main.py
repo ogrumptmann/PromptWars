@@ -4,7 +4,7 @@ Prompt Wars - FastAPI Backend Entry Point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import health, websockets, redis_test, cards
+from app.api import health, websockets, redis_test, cards, judge
 
 app = FastAPI(
     title="Prompt Wars API",
@@ -26,6 +26,7 @@ app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(websockets.router, tags=["websockets"])
 app.include_router(redis_test.router, prefix="/api", tags=["redis"])
 app.include_router(cards.router, prefix="/api", tags=["cards"])
+app.include_router(judge.router, prefix="/api", tags=["judge"])
 
 @app.get("/")
 async def root():

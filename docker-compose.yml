@@ -27,14 +27,11 @@ services:
       - "3001:8000"
     volumes:
       - ./backend:/app
+    env_file:
+      - ./backend/.env
     environment:
       - APP_ENV=development
       - REDIS_URL=redis://redis:6379
-      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - LOCAL_LLM_BASE_URL=${LOCAL_LLM_BASE_URL:-http://localhost:11434/v1}
-      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-llama3}
     depends_on:
       redis:
         condition: service_healthy

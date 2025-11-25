@@ -14,17 +14,17 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379"
     
     # LLM Provider Configuration
-    llm_provider: Literal["openai", "gemini", "local"] = "openai"
-    
+    llm_provider: Literal["openai", "gemini", "ollama"] = "openai"
+    llm_model: str = "gpt-4o-mini"
+
     # OpenAI
     openai_api_key: str = ""
-    
+
     # Gemini
-    gemini_api_key: str = ""
-    
-    # Local (Ollama)
-    local_llm_base_url: str = "http://localhost:11434/v1"
-    local_llm_model: str = "llama3"
+    google_api_key: str = ""
+
+    # Ollama (Local)
+    ollama_base_url: str = "http://localhost:11434"
     
     class Config:
         env_file = ".env"
