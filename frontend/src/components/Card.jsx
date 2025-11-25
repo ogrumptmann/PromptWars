@@ -5,32 +5,6 @@
 import PropTypes from 'prop-types'
 
 const Card = ({ card, isSelected, onSelect, disabled }) => {
-  const getCardColor = (type) => {
-    switch (type) {
-      case 'element':
-        return 'from-red-500 to-orange-500'
-      case 'action':
-        return 'from-blue-500 to-cyan-500'
-      case 'material':
-        return 'from-green-500 to-emerald-500'
-      default:
-        return 'from-gray-500 to-gray-600'
-    }
-  }
-
-  const getCardIcon = (type) => {
-    switch (type) {
-      case 'element':
-        return '🔥'
-      case 'action':
-        return '⚔️'
-      case 'material':
-        return '🛡️'
-      default:
-        return '🎴'
-    }
-  }
-
   const handleClick = () => {
     if (!disabled && onSelect) {
       onSelect(card.id)
@@ -38,44 +12,28 @@ const Card = ({ card, isSelected, onSelect, disabled }) => {
   }
 
   return (
-    <div
+    <button
       onClick={handleClick}
+      disabled={disabled}
       className={`
-        relative p-4 rounded-lg cursor-pointer transition-all duration-200
-        bg-gradient-to-br ${getCardColor(card.type)}
-        ${isSelected ? 'ring-4 ring-yellow-400 scale-105 shadow-xl' : 'hover:scale-105 shadow-lg'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+        w-full p-3 rounded border-2 transition-all duration-200 text-left
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+        ${isSelected
+          ? 'border-yellow-400 bg-yellow-900 bg-opacity-30'
+          : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+        }
       `}
     >
-      {/* Card Icon */}
-      <div className="text-3xl mb-2 text-center">
-        {getCardIcon(card.type)}
-      </div>
-      
       {/* Card Name */}
-      <h3 className="text-white font-bold text-center text-lg mb-1">
+      <div className="text-white font-bold text-base uppercase tracking-wide">
         {card.name}
-      </h3>
-      
-      {/* Card Type Badge */}
-      <div className="text-center mb-2">
-        <span className="inline-block px-2 py-1 bg-black bg-opacity-30 rounded text-white text-xs uppercase">
-          {card.type}
-        </span>
       </div>
-      
-      {/* Card Description */}
-      <p className="text-white text-opacity-90 text-sm text-center italic">
-        {card.description}
-      </p>
-      
-      {/* Selection Indicator */}
-      {isSelected && (
-        <div className="absolute top-2 right-2 bg-yellow-400 rounded-full w-6 h-6 flex items-center justify-center">
-          <span className="text-black font-bold">✓</span>
-        </div>
-      )}
-    </div>
+
+      {/* Card Type */}
+      <div className="text-gray-400 text-xs uppercase mt-1">
+        {card.type}
+      </div>
+    </button>
   )
 }
 

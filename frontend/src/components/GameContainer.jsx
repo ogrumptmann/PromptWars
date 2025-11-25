@@ -2,10 +2,11 @@
  * GameContainer Component
  * Main game orchestrator - manages game flow and state
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { fetchCards, drawHand, submitBattle } from '../services/api'
-import PlayerStatus from './PlayerStatus'
+import Header from './Header'
+import Arena from './Arena'
 import CardHand from './CardHand'
 import PromptInput from './PromptInput'
 import BattleLog from './BattleLog'
@@ -20,6 +21,7 @@ const GameContainer = () => {
     battleHistory,
     isLoading,
     error,
+    currentTurn,
     setPlayerHand,
     setMyPrompt,
     toggleCardSelection,
@@ -33,6 +35,9 @@ const GameContainer = () => {
     setAllCards,
     resetGame,
   } = useGameStore()
+
+  // Timer state (placeholder for Phase 2.6 WebSocket integration)
+  const [timeRemaining, setTimeRemaining] = useState(45)
 
   // Initialize game - fetch cards and draw initial hand
   useEffect(() => {
@@ -129,70 +134,62 @@ const GameContainer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black text-white p-4">
-      <div className="container mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-8 relative">
-          <h1 className="text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            ⚔️ Prompt Wars
-          </h1>
-          <p className="text-gray-300">Battle with creative prompts!</p>
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* Header with Round and Timer */}
+      <Header round={currentTurn + 1} timeRemaining={timeRemaining} />
 
-          {/* Reset Button */}
+      {/* Arena with Player Avatars and HP */}
+      <Arena
+        playerHP={player.hp}
+        opponentHP={opponent.hp}
+        playerName={player.username || 'You'}
+        opponentName={opponent.username || 'Opponent'}
+      />
+
+      {/* Error Display */}
+      {error && (
+        <div className="mx-4 my-2 p-3 bg-red-900 bg-opacity-50 border-2 border-red-500 rounded-lg">
+          <p className="text-white text-sm">❌ {error}</p>
           <button
             onClick={() => {
-              if (confirm('Are you sure you want to reset the game?')) {
-                resetGame()
-                window.location.reload()
-              }
+              resetGame()
+              window.location.reload()
             }}
-            className="absolute top-0 right-0 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+            className="mt-2 px-3 py-1 bg-red-700 hover:bg-red-600 rounded text-xs"
           >
-            🔄 Reset Game
+            Reset Game
           </button>
         </div>
+      )}
 
-        {/* Error Display */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-900 bg-opacity-50 border-2 border-red-500 rounded-lg">
-            <p className="text-white">❌ {error}</p>
-          </div>
-        )}
+      {/* Battle Log */}
+      <div className="border-b-2 border-gray-700">
+        <BattleLog
+          battleHistory={battleHistory}
+          playerName={player.username || 'You'}
+          opponentName={opponent.username || 'Opponent'}
+        />
+      </div>
 
-        {/* Player Status Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <PlayerStatus player={player} isOpponent={false} />
-          <PlayerStatus player={opponent} isOpponent={true} />
-        </div>
+      {/* Cards Hand */}
+      <div className="border-b-2 border-gray-700 p-4 bg-gray-900">
+        <CardHand
+          cards={player.hand}
+          selectedCards={mySelectedCards}
+          onCardSelect={toggleCardSelection}
+          disabled={hasSubmitted || isLoading}
+        />
+      </div>
 
-        {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Cards and Prompt */}
-          <div className="lg:col-span-2 space-y-6">
-            <CardHand
-              cards={player.hand}
-              selectedCards={mySelectedCards}
-              onCardSelect={toggleCardSelection}
-              disabled={hasSubmitted || isLoading}
-            />
-            <PromptInput
-              value={myPrompt}
-              onChange={setMyPrompt}
-              onSubmit={handlePromptSubmit}
-              disabled={hasSubmitted || isLoading}
-              selectedCards={mySelectedCards}
-            />
-          </div>
-
-          {/* Right Column - Battle Log */}
-          <div className="lg:col-span-1">
-            <BattleLog
-              battleHistory={battleHistory}
-              playerName={player.username}
-              opponentName={opponent.username}
-            />
-          </div>
-        </div>
+      {/* Prompt Input (Bottom) */}
+      <div className="p-4 bg-gray-900">
+        <PromptInput
+          value={myPrompt}
+          onChange={setMyPrompt}
+          onSubmit={handlePromptSubmit}
+          selectedCards={mySelectedCards}
+          disabled={hasSubmitted || isLoading}
+        />
       </div>
     </div>
   )
