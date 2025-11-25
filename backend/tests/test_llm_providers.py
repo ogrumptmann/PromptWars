@@ -70,12 +70,15 @@ class TestOpenAIProvider:
             assert provider.client is None
     
     @pytest.mark.asyncio
-    async def test_generate_without_client(self):
+    async def test_generate_without_client(self, monkeypatch):
         """Test generate raises error without client"""
+        # Clear environment variable to ensure no fallback
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
         provider = OpenAIProvider(api_key=None)
         messages = [LLMMessage(role="user", content="Hello")]
-        
-        with pytest.raises(ValueError, match="not initialized"):
+
+        with pytest.raises(ValueError, match="OpenAI client not initialized"):
             await provider.generate(messages)
     
     @pytest.mark.asyncio
@@ -104,8 +107,11 @@ class TestOpenAIProvider:
         assert response.usage["total_tokens"] == 15
     
     @pytest.mark.asyncio
-    async def test_is_available_without_key(self):
+    async def test_is_available_without_key(self, monkeypatch):
         """Test is_available returns False without API key"""
+        # Clear environment variable to ensure no fallback
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
         provider = OpenAIProvider(api_key=None)
         assert await provider.is_available() is False
 
