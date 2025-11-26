@@ -1,0 +1,326 @@
+# Prompt Wars - Augment AI Rules & Guidelines
+
+## 🎯 Project Overview
+This is "Prompt Wars" - an AI-powered text-based strategy game where players battle using creative prompts judged by Large Language Models. The project follows a 5-phase development plan with strict Git branching strategy.
+
+## 📋 Critical Requirements
+
+### Testing Requirements (MANDATORY)
+1. **ALL code changes MUST have tests before commit**
+   - Unit tests for all new functions/classes
+   - Integration tests for API endpoints
+   - UI tests for React components
+   - Pre-commit hooks will BLOCK commits without passing tests
+
+2. **Test Coverage Requirements**
+   - Backend: Minimum 50% coverage (pytest-cov)
+   - Frontend: Comprehensive component testing (Vitest + @testing-library/react)
+   - All tests must pass before any commit
+
+3. **Test Types Required**
+   - **Unit Tests**: Individual functions, classes, utilities
+   - **Integration Tests**: API endpoints, database operations, service interactions
+   - **UI Tests**: Component rendering, user interactions, state changes
+
+### Git Workflow Rules
+1. **Branch Strategy**
+   - Each phase has its own feature branch: `feature/phase-X-name`
+   - Never commit directly to `main`
+   - Create Pull Request when phase is complete
+   - All tests must pass in CI/CD before merge
+
+2. **Commit Message Format**
+   ```
+   type: brief description
+   
+   - Detailed change 1
+   - Detailed change 2
+   
+   Types: feat, fix, docs, test, refactor, style, chore
+   ```
+
+3. **Before Every Commit**
+   - Run backend tests: `docker-compose exec backend pytest -v`
+   - Run frontend tests: `docker-compose exec frontend npm test`
+   - Verify all tests pass
+   - Pre-commit hooks will enforce this
+
+## 🏗️ Architecture & Design Patterns
+
+### Backend (Python/FastAPI)
+1. **Design Patterns to Use**
+   - Repository Pattern: Separate database logic from business logic
+   - Adapter Pattern: LLM-agnostic design via abstract base classes
+   - Factory Pattern: LLM provider selection via environment variables
+   - Singleton Pattern: Services like CardService, LLMProvider
+
+2. **Code Structure**
+   ```
+   backend/app/
+   ├── api/          # FastAPI route handlers
+   ├── models/       # Pydantic data models
+   ├── services/     # Business logic (CardService, GameService, JudgeService)
+   ├── repositories/ # Database access layer
+   ├── providers/    # External integrations (LLM providers)
+   └── data/         # Static data (cards.json)
+   ```
+
+3. **Type Safety**
+   - ALL functions must use Pydantic models for input/output
+   - Use type hints everywhere
+   - Validate all external data with Pydantic
+
+4. **Error Handling**
+   - Use FastAPI HTTPException for API errors
+   - Log all errors with context
+   - Return meaningful error messages to frontend
+
+### Frontend (React/Vite)
+1. **Component Structure**
+   - Follow Master Design Document Section 5 (UI Specification)
+   - Mobile-first portrait layout (vertical stacking)
+   - Component hierarchy:
+     ```
+     App
+     └── GameContainer
+         ├── Header (Round #, Timer)
+         ├── Arena (Avatars, HP bars) [PixiJS in Phase 3]
+         ├── BattleLog (Text history)
+         ├── CardHand (3 cards horizontal)
+         └── PromptInput (Text area + CAST button)
+     ```
+
+2. **State Management**
+   - Use Zustand for global game state
+   - Keep component state local when possible
+   - No prop drilling - use Zustand hooks
+
+3. **Styling**
+   - Tailwind CSS only (no custom CSS files)
+   - Mobile-first responsive design
+   - Dark theme (black/gray backgrounds)
+   - Simple, clean UI (no elaborate gradients)
+
+4. **Component Guidelines**
+   - PropTypes for all props
+   - Default props where appropriate
+   - Keep components under 150 lines
+   - One component per file
+
+## 📦 Package Management
+
+### CRITICAL: Always Use Package Managers
+**NEVER manually edit package files** (package.json, requirements.txt, etc.)
+
+1. **JavaScript/Node.js**
+   ```bash
+   # Install dependencies
+   docker-compose exec frontend npm install <package>
+   
+   # Remove dependencies
+   docker-compose exec frontend npm uninstall <package>
+   ```
+
+2. **Python**
+   ```bash
+   # Install dependencies
+   docker-compose exec backend pip install <package>
+   
+   # Update requirements.txt
+   docker-compose exec backend pip freeze > requirements.txt
+   ```
+
+3. **Why?**
+   - Package managers resolve correct versions
+   - Handle dependency conflicts automatically
+   - Update lock files properly
+   - Prevent version mismatches
+
+## 🐳 Docker Development
+
+### All Services Run in Docker
+1. **No Local Installations Required**
+   - Backend runs in Docker container (port 3001)
+   - Frontend runs in Docker container (port 5173)
+   - Redis runs in Docker container (port 6379)
+
+2. **Hot Reload Enabled**
+   - Backend: Uvicorn auto-reload on file changes
+   - Frontend: Vite HMR (Hot Module Replacement)
+   - Changes reflect immediately without restart
+
+3. **Common Commands**
+   ```bash
+   # Start all services
+   docker-compose up -d
+   
+   # View logs
+   docker-compose logs -f [service]
+   
+   # Execute commands in containers
+   docker-compose exec [service] [command]
+   
+   # Restart service
+   docker-compose restart [service]
+   
+   # Stop all services
+   docker-compose down
+   ```
+
+## 🎨 UI Design Rules (Master Design Document)
+
+### Mobile-First Portrait Layout
+1. **Vertical Component Stacking** (NOT horizontal desktop layout)
+   ```
+   ┌─────────────────────────┐
+   │ Header (Round + Timer)  │
+   ├─────────────────────────┤
+   │ Arena (Avatars + HP)    │
+   ├─────────────────────────┤
+   │ Battle Log              │
+   ├─────────────────────────┤
+   │ Card Hand (3 cards)     │
+   ├─────────────────────────┤
+   │ Prompt Input + CAST     │
+   └─────────────────────────┘
+   ```
+
+2. **Simple Card Design**
+   - Button-style cards (NOT elaborate gradients)
+   - Card name + type only
+   - Yellow highlight when selected
+
+3. **Arena Component**
+   - Player avatars: 👤 (You) vs 🤖 (Opponent)
+   - Inline HP bars (NOT separate PlayerStatus cards)
+   - Black canvas background (placeholder for PixiJS)
+
+4. **Color Scheme**
+   - Background: Black (#000000)
+   - Panels: Dark gray (#1F2937, #111827)
+   - Borders: Gray (#374151)
+   - Accents: Blue (#3B82F6), Yellow (#FACC15)
+
+## 🧪 Testing Guidelines
+
+### Backend Testing (pytest)
+1. **Test File Structure**
+   ```
+   backend/tests/
+   ├── test_api/          # API endpoint tests
+   ├── test_services/     # Service layer tests
+   ├── test_repositories/ # Database tests
+   └── conftest.py        # Shared fixtures
+   ```
+
+2. **Required Fixtures**
+   - `test_client`: FastAPI TestClient
+   - `mock_redis`: fakeredis for Redis tests
+   - `sample_cards`: Test card data
+
+3. **Test Naming**
+   - `test_<function_name>_<scenario>`
+   - Example: `test_draw_hand_returns_three_cards`
+
+### Frontend Testing (Vitest)
+1. **Test File Structure**
+   ```
+   frontend/src/components/
+   ├── Component.jsx
+   └── Component.test.jsx  # Co-located with component
+   ```
+
+2. **Required Test Cases**
+   - Component renders without crashing
+   - Props are displayed correctly
+   - User interactions work (clicks, input)
+   - State updates correctly
+   - Error states handled
+
+3. **Testing Library Best Practices**
+   - Use `getByRole` over `getByTestId`
+   - Test user behavior, not implementation
+   - Use `userEvent` for interactions
+   - Mock API calls with MSW or vi.mock
+
+## 🔒 Security & Best Practices
+
+### Environment Variables
+1. **Never Commit Secrets**
+   - `.env` file is in `.gitignore`
+   - Use `.env.example` for documentation
+   - Required vars: `LLM_PROVIDER`, `OPENAI_API_KEY`, etc.
+
+2. **LLM Provider Configuration**
+   ```env
+   LLM_PROVIDER=openai  # or gemini, ollama
+   OPENAI_API_KEY=sk-...
+   OPENAI_MODEL=gpt-4
+   ```
+
+### API Security
+1. **Input Validation**
+   - Validate all inputs with Pydantic
+   - Sanitize user prompts (prevent injection)
+   - Rate limiting (Phase 5)
+
+2. **Error Messages**
+   - Don't expose internal errors to users
+   - Log detailed errors server-side
+   - Return generic messages to frontend
+
+## 📝 Code Review Checklist
+
+Before committing, verify:
+- [ ] All tests written and passing
+- [ ] Code follows design patterns
+- [ ] Type hints/PropTypes added
+- [ ] Error handling implemented
+- [ ] No secrets in code
+- [ ] Follows UI design document
+- [ ] Package manager used for dependencies
+- [ ] Commit message follows format
+- [ ] Pre-commit hooks pass
+
+## 🚀 Phase Development Rules
+
+### Current Phase: Phase 2 - Core Game Loop
+- Branch: `feature/phase-2-core-game-loop`
+- Focus: Text-based MVP with AI judge
+- No PixiJS yet (that's Phase 3)
+- Mock opponent (real multiplayer in Task 2.6)
+
+### Phase Completion Criteria
+1. All subtasks complete
+2. All tests passing (backend + frontend)
+3. Manual testing verified
+4. Documentation updated
+5. Create Pull Request
+6. CI/CD passes
+7. Code review approved
+8. Merge to main
+
+## 🎯 AI Assistant Guidelines
+
+When helping with this project:
+1. **Always check Master Design Document** before making UI changes
+2. **Always write tests** before or with code changes
+3. **Use codebase-retrieval** to understand existing patterns
+4. **Follow the phase plan** - don't jump ahead
+5. **Ask before** installing dependencies, committing, or pushing
+6. **Verify tests pass** after every change
+7. **Use parallel tool calls** for efficiency
+8. **Keep edits under 150 lines** per tool call
+
+## 📚 Key Documentation
+
+- `STATUS.md` - Current development status
+- `QUICK_START.md` - 5-minute setup guide
+- `docs/MASTER_DESIGN.md` - Complete design specification
+- `README.md` - Project overview
+- `.augment_rules` - This file
+
+---
+
+**Remember: Tests are mandatory. No exceptions. Ever.** ✅
+
