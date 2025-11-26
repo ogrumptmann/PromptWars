@@ -20,13 +20,19 @@ Your role is to evaluate two players' creative prompts and determine the winner 
 2. **Card Adherence** (0-10): How well does the prompt incorporate the required cards?
 3. **Battle Impact**: Which prompt would be more effective in a fantasy battle?
 
-RULES:
-- Each player submits a prompt using specific cards (elements, actions, materials)
-- The prompt MUST use all the cards they selected
+CRITICAL RULES - CARD ADHERENCE:
+- Each player MUST use ALL the cards they selected in their prompt
+- Check CAREFULLY: Does the prompt mention or use EVERY card listed?
+- If a player uses a card they DON'T have (e.g., mentions "fire" without a fire card), give them 0/10 adherence
+- If a player fails to use even ONE of their selected cards, give them 0/10 adherence
+- Missing cards or using wrong cards = AUTOMATIC LOSS (they forfeit the round)
+- Only if BOTH players cheat, then judge normally but mention the cheating in the story
+
+SCORING:
+- Creativity: 0-10 for imagination and originality
+- Card Adherence: 0-10 for using ALL required cards correctly
+- If adherence is 0-3, that player should almost always lose (unless opponent also cheated)
 - Award higher scores for creative combinations and vivid imagery
-- Deduct points if cards are not properly incorporated
-- Determine a winner based on overall effectiveness
-- Ties are allowed if both prompts are equally matched
 
 OUTPUT FORMAT (JSON):
 {
@@ -36,11 +42,11 @@ OUTPUT FORMAT (JSON):
   "player2_creativity": 0-10,
   "player2_adherence": 0-10,
   "damage": 0-50 (damage dealt to loser, 0 for tie),
-  "reasoning": "Write a SHORT, EXCITING 2-3 sentence story describing what happened in the battle and who won. Make it dramatic and engaging! Example: 'The warrior summons a blazing phoenix that soars through the arena! The opponent's ice shield shatters under the intense heat. Victory goes to the fire wielder!'",
+  "reasoning": "Write a SHORT, EXCITING 2-3 sentence story describing what happened in the battle and who won. Make it dramatic and engaging! If someone cheated (didn't use their cards), mention it in the story! Example: 'The warrior tries to summon fire, but has no fire card! The spell fizzles out. The opponent wins by default!'",
   "visual_effect": "fire" or "ice" or "lightning" or "explosion" or "heal" or "shield"
 }
 
-Be fair, creative, and entertaining in your judgments! The reasoning should be a mini-story, not a dry explanation."""
+Be STRICT about card adherence! Players who cheat should lose. The reasoning should be a mini-story that mentions cheating if it occurred."""
     
     def __init__(self, llm_provider: LLMProvider = None):
         """
@@ -73,14 +79,16 @@ Be fair, creative, and entertaining in your judgments! The reasoning should be a
         return f"""BATTLE ROUND
 
 {player1_name}:
-- Cards Used: {', '.join(player1_submission.cards_used)}
+- Cards Available: [{', '.join(player1_submission.cards_used)}]
 - Prompt: "{player1_submission.prompt}"
+- CHECK: Does the prompt use ALL of these cards: {', '.join(player1_submission.cards_used)}?
 
 {player2_name}:
-- Cards Used: {', '.join(player2_submission.cards_used)}
+- Cards Available: [{', '.join(player2_submission.cards_used)}]
 - Prompt: "{player2_submission.prompt}"
+- CHECK: Does the prompt use ALL of these cards: {', '.join(player2_submission.cards_used)}?
 
-Judge this battle and provide your verdict in JSON format."""
+Judge this battle and provide your verdict in JSON format. Remember: Players MUST use ALL their cards!"""
     
     async def judge_battle(
         self,
