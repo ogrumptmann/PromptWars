@@ -36,11 +36,11 @@ OUTPUT FORMAT (JSON):
   "player2_creativity": 0-10,
   "player2_adherence": 0-10,
   "damage": 0-50 (damage dealt to loser, 0 for tie),
-  "reasoning": "Brief explanation of your decision",
+  "reasoning": "Write a SHORT, EXCITING 2-3 sentence story describing what happened in the battle and who won. Make it dramatic and engaging! Example: 'The warrior summons a blazing phoenix that soars through the arena! The opponent's ice shield shatters under the intense heat. Victory goes to the fire wielder!'",
   "visual_effect": "fire" or "ice" or "lightning" or "explosion" or "heal" or "shield"
 }
 
-Be fair, creative, and entertaining in your judgments!"""
+Be fair, creative, and entertaining in your judgments! The reasoning should be a mini-story, not a dry explanation."""
     
     def __init__(self, llm_provider: LLMProvider = None):
         """
