@@ -148,10 +148,130 @@ Both players plan secretly, then actions resolve simultaneously.
 
 **Epic 5.2: Matchmaking Service**
 
-* \[ \] **Task 28:** Implement MatchmakingService (Redis List/Queue).  
-  * Logic: Simple FIFO for MVP. (Bonus: Buckets by Elo \+/- 200).  
-* \[ \] **Task 29:** WebSocket: Handle FIND\_MATCH and CANCEL\_MATCH.  
+* \[ \] **Task 28:** Implement MatchmakingService (Redis List/Queue).
+  * Logic: Simple FIFO for MVP. (Bonus: Buckets by Elo \+/- 200).
+* \[ \] **Task 29:** WebSocket: Handle FIND\_MATCH and CANCEL\_MATCH.
 * \[ \] **Task 30:** Frontend: Add "Play Now" vs "Private Game" toggle.
+
+### **Phase 6: AI-Generated Battle Replay Videos (Post-Game Feature)**
+
+*Goal: Transform battle data into cinematic replay videos in the style of classic Japanese RPG battles (Final Fantasy, Dragon Quest).*
+
+**Epic 6.1: Battle Data Persistence**
+
+* \[ \] **Task 31:** Extend BattleResult model to include full battle context:
+  * Player prompts and selected cards for each turn
+  * AI judge reasoning/narrative for each turn
+  * Damage dealt, HP changes, visual effects
+  * Environment state changes
+  * Timestamps for each turn
+* \[ \] **Task 32:** Implement BattleHistoryService to persist complete battle data in Redis:
+  * Key structure: `battle_history:{game_id}` with TTL (7 days)
+  * Store as JSON with all turn data, player names, final outcome
+* \[ \] **Task 33:** Create API endpoint `/api/battles/{game_id}/replay-data`:
+  * Returns complete battle history in structured format
+  * Includes all prompts, cards, AI narratives, and visual effects
+
+**Epic 6.2: AI Video Script Generation**
+
+* \[ \] **Task 34:** Create VideoScriptService that uses LLM to generate video script:
+  * Input: Complete battle history from Task 32
+  * Output: Structured video script with:
+    * Scene descriptions for each turn
+    * Camera angles and transitions
+    * Character animations (attack, defend, hurt, victory)
+    * Visual effect timings and intensities
+    * Background music cues
+* \[ \] **Task 35:** Design video script Pydantic model:
+  * `VideoScript` with list of `Scene` objects
+  * Each `Scene` includes: duration, camera_angle, character_actions, effects, narration
+  * Style parameters: "classic_jrpg", "pixel_art", "anime_style"
+* \[ \] **Task 36:** Implement LLM prompt for video generation:
+  * System prompt: "You are a video director for classic JRPG battle scenes..."
+  * Include examples of Final Fantasy battle cinematography
+  * Ensure output matches structured format
+
+**Epic 6.3: Video Generation Integration**
+
+* \[ \] **Task 37:** Research and select video generation API:
+  * Options: Runway ML, Pika Labs, Stability AI Video, or custom Stable Diffusion Video
+  * Evaluate: cost per video, generation time, style control, API reliability
+* \[ \] **Task 38:** Create VideoGenerationService (Adapter Pattern):
+  * Abstract base class for video generation providers
+  * Implement provider-specific adapters (similar to LLM providers)
+  * Handle async video generation (webhook callbacks)
+* \[ \] **Task 39:** Implement video generation pipeline:
+  * Convert VideoScript to provider-specific prompts
+  * Generate video segments for each battle turn
+  * Stitch segments together with transitions
+  * Add background music and sound effects
+  * Store final video in cloud storage (Azure Blob / S3)
+
+**Epic 6.4: Replay UI & Sharing**
+
+* \[ \] **Task 40:** Create "Generate Replay Video" button on game over screen:
+  * Show estimated generation time (2-5 minutes)
+  * Display progress indicator with status updates
+  * Use WebSocket to notify when video is ready
+* \[ \] **Task 41:** Create VideoReplayModal component:
+  * Embedded video player
+  * Download button
+  * Share to social media (Twitter, Discord, Reddit)
+  * Copy shareable link
+* \[ \] **Task 42:** Implement video gallery/history:
+  * `/profile/replays` page showing user's generated videos
+  * Thumbnail previews
+  * View count and likes (optional social features)
+* \[ \] **Task 43:** Add video metadata and SEO:
+  * Generate thumbnail from first frame
+  * Add title: "Epic Battle: [Player1] vs [Player2]"
+  * Include battle stats in description
+  * Open Graph tags for social sharing
+
+**Epic 6.5: Style Customization & Polish**
+
+* \[ \] **Task 44:** Implement style selection UI:
+  * Classic JRPG (Final Fantasy 6-9 style)
+  * Pixel Art (16-bit retro)
+  * Modern Anime (Final Fantasy 7 Remake style)
+  * Chibi/Cute style
+* \[ \] **Task 45:** Add video customization options:
+  * Battle speed (slow-mo, normal, fast)
+  * Music selection (epic, dramatic, upbeat)
+  * Include/exclude AI narration voiceover
+  * Add player commentary text overlays
+* \[ \] **Task 46:** Implement video caching and optimization:
+  * Cache generated videos for 30 days
+  * Compress videos for web delivery
+  * Generate multiple resolutions (480p, 720p, 1080p)
+  * Add watermark with game logo (optional)
+
+**Technical Considerations:**
+
+* **Cost Management:** Video generation can be expensive. Consider:
+  * Free tier: 1 video per day per user
+  * Premium tier: Unlimited videos
+  * Queue system to manage API rate limits
+* **Generation Time:** Videos may take 2-10 minutes to generate:
+  * Use async job queue (Celery or Redis Queue)
+  * Send email/push notification when ready
+  * Show estimated completion time
+* **Storage:** Videos can be large (50-200MB):
+  * Use cloud storage with CDN
+  * Implement automatic cleanup after 30 days
+  * Offer download before deletion
+* **Quality Control:** AI-generated videos may have artifacts:
+  * Implement review/regenerate option
+  * Allow users to report issues
+  * Consider human review for featured videos
+
+**Success Metrics:**
+
+* % of players who generate at least one replay video
+* Average videos generated per active player
+* Social shares and viral coefficient
+* User retention impact (players who generate videos vs those who don't)
+* Video generation cost per user
 
 ## **5\. UI Specification & Component Tree**
 
